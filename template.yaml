@@ -8,7 +8,7 @@ Metadata:
     Name: Amazon-EventBridge-Integration-PLAID-KARTE-Comprehend
     Description: This application demonstrates an integration with AWS Lambda, and Amazon Comprehend for KARTE of Amazon EventBridge SaaS Partner PLAID
     Author: AWS Quick Start
-    LicenseUrl: LICENSE
+    LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md
     Labels:
       - amazon
