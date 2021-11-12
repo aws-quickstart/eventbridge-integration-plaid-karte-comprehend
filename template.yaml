@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  eventbridge-integration-plaid-karte-comprehend
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: Amazon-EventBridge-Integration-PLAID-KARTE-Comprehend
+    Description: This application demonstrates an integration with AWS Lambda, and Amazon Comprehend for KARTE of Amazon EventBridge SaaS Partner PLAID
+    Author: AWS Quick Start
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels:
+      - amazon
+      - eventbridge
+      - integration
+      - solution
+      - aws
+      - lambda
+      - amazon_comprehend
+      - plaid
+      - questionnaire
+    HomePageUrl: https://aws.amazon.com/quickstart/eventbridge/eventbridge-integration-plaid-karte-comprehend/
+    SemanticVersion: 0.1.0
+    SourceCodeUrl: https://github.com/aws-quickstart/eventbridge-integration-plaid-karte-comprehend
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Amazon EventBridge Integration Solution
+        Parameters:
+          - EventSourceName
+          - KARTEAccessToken
+          - KARTEApiHostname
+
+    ParameterLabels:
+      EventSourceName:
+        default: Event Source Name
+      KARTEAccessToken:
+        default: KARTEAccessToken
+      KARTEApiHostname:
+        default: KARTEApiHostname
+
+Parameters:
+  EventSourceName:
+    Type: String
+    AllowedPattern: ^aws\.partner\/karte.io(\/[\.\-_a-z0-9]+){3}$
+    MinLength: 1
+    MaxLength: 256
+    Description: Name of the Amazon EventBridge KARTE Event Source to associate with an Event Bus. For example, aws.partner/karte.io/{AWSAccountID}/{KARTEProjectId}/{AppName}
+  KARTEAccessToken:
+    Type: String
+    Description: KARTEAccessToken
+    NoEcho: true
+  KARTEApiHostname:
+    Type: String
+    Default: api.karte.io
+    Description: KARTEApiHostname
+
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        KARTEAccessToken: !Ref KARTEAccessToken
+        KARTEApiHostname: !Ref KARTEApiHostname
+Resources:
+  #############
+  #  SNS  #
+  #############
+
+  KARTESentimentAnalysisTopic:
+    Type: AWS::SNS::Topic
+    "Properties" :
+      "TopicName" : t1
+
+  #############
+  #  Lambda  #
+  #############
+  GetSentiment:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/GetSentiment
+      Handler: getSentiment.handler
+      Runtime: nodejs14.x
+      Policies:
+        - ComprehendFullAccess
+        - SNSCrudPolicy:
+            TopicName:
+              Fn::GetAtt:
+                - KARTESentimentAnalysisTopic
+                - TopicName
+      Events:
+        SubscribedTopic:
+          Properties:
+            Topic:
+              Ref: KARTESentimentAnalysisTopic
+          Type: SNS
+
+  #################
+  #  EventBridge  #
+  #################
+  EventBridgeEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Ref EventSourceName
+      EventSourceName: !Ref EventSourceName
+
+  EventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: catch-all rule for event bus
+      EventBusName: !Ref EventBridgeEventBus
+      EventPattern:
+        account:
+          - !Ref AWS::AccountId
+        detail:
+          content:
+            event_type:
+              - 'talk/message/sendFromUser'
+        detail-type:
+          - 'KARTE ApiV2Hook'
+      Name: karte-oeq-sentiment-analysis
+      State: ENABLED
+      Targets:
+        - Arn:
+            Ref: KARTESentimentAnalysisTopic
+          Id: !GetAtt KARTESentimentAnalysisTopic.TopicName
+  EventTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 'sns:Publish'
+            Resource: '*'
+      Topics:
+        - !Ref KARTESentimentAnalysisTopic
+Outputs:
+  EventBridgeEventBus:
+    Description: SaaS Event Bus ARN
+    Value: !GetAtt EventBridgeEventBus.Arn
+  EventBridgeRule:
+    Description: EventBridge Rule ARN
+    Value: !GetAtt EventBridgeRule.Arn
+  GetSentimentFunction:
+    Description: GetSentiment Function ARN
+    Value: !GetAtt GetSentiment.Arn
+  KARTESentimentAnalysisTopic:
+    Description: KARTESentimentAnalysisTopic TopicName
+    Value: !GetAtt KARTESentimentAnalysisTopic.TopicName
