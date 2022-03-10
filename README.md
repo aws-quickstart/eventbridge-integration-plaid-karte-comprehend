@@ -1,12 +1,10 @@
-# eventbridge-integration-plaid-karte-comprehend
-## Amazon EventBridge Integration Solution: Reaching out to online end users with KARTE Talk and Amazon Comprehend
+## PLAID KARTE Comprehend EventBridge integration
 
-This Quick Start deploys an integration with Amazon Comprehend, AWS Lambda and AWS SNS for Amazon EventBridge SaaS Partner Integrations with PLAID. 
+This Amazon EventBridge integration combines the PLAID KARTE software as a service (SaaS) with Amazon Comprehend, Amazon Web Services (AWS) Lambda, and Amazon EventBridge to analyze sentiment and extract key phrases from chat messages to update KARTE user data.
 
-With this solution, chat messages sent to KARTE are analyzed for sentiment & key phrase extraction using Amazon Comprehend. Optimal messages can be sent based on the analysis results.
+KARTE sends events that include the chat message body and the ID of the user who sent the chat. The chat message is then used by Amazon Comprehend to analyze sentiment and extract key phrases in real time.  As KARTE is an event-driven system, you can use the information to perform various actions on users in real time when the KARTE user data is updated. 
 
-![Quick Start architecture for EventBridge Integration Solution for Amazon Comprehend](images/arch-eventbridge-integration-plaid-karte-comprehend.png)
-
+![Quick Start architecture for EventBridge integration for Amazon Comprehend](images/eventbridge-plaid-karte-comprehend-architecture-diagram.png)
 
 To post feedback, submit feature ideas, or report bugs, use the Issues section of [this GitHub repo](https://github.com/aws-quickstart/eventbridge-integration-plaid-karte-comprehend).
 
