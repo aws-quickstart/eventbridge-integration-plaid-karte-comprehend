@@ -8,7 +8,7 @@ Description: >
 Metadata:
   AWS::ServerlessRepo::Application:
     Name: Amazon-EventBridge-Integration-PLAID-KARTE-Comprehend
-    Description: This application demonstrates an integration with AWS Lambda, and Amazon Comprehend for KARTE of Amazon EventBridge SaaS Partner PLAID
+    Description: This application demonstrates an integration with AWS Lambda and Amazon Comprehend for KARTE of Amazon EventBridge SaaS Partner PLAID
     Author: AWS Quick Start
     LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md
@@ -36,11 +36,11 @@ Metadata:
 
     ParameterLabels:
       EventSourceName:
-        default: Event Source Name
+        default: Event source name
       KARTEAccessToken:
-        default: KARTEAccessToken
+        default: KARTE access token
       KARTEApiHostname:
-        default: KARTEApiHostname
+        default: KARTE API host name
 
 Parameters:
   EventSourceName:
@@ -48,7 +48,7 @@ Parameters:
     AllowedPattern: ^aws\.partner\/karte.io(\/[\.\-_a-z0-9]+){3}$
     MinLength: 1
     MaxLength: 256
-    Description: Name of the Amazon EventBridge KARTE Event Source to associate with an Event Bus. For example, aws.partner/karte.io/{AWSAccountID}/{KARTEProjectId}/{AppName}
+    Description: Name of the Amazon EventBridge KARTE event source to associate with an event bus. For example, aws.partner/karte.io/{AWSAccountID}/{KARTEProjectId}/{AppName}
   KARTEAccessToken:
     Type: String
     Description: KARTEAccessToken
@@ -110,7 +110,7 @@ Resources:
   EventBridgeRule:
     Type: AWS::Events::Rule
     Properties:
-      Description: catch-all rule for event bus
+      Description: Catch-all rule for the event bus.
       EventBusName: !Ref EventBridgeEventBus
       EventPattern:
         account:
@@ -141,13 +141,13 @@ Resources:
         - !Ref KARTESentimentAnalysisTopic
 Outputs:
   EventBridgeEventBus:
-    Description: SaaS Event Bus ARN
+    Description: SaaS event bus ARN
     Value: !GetAtt EventBridgeEventBus.Arn
   EventBridgeRule:
-    Description: EventBridge Rule ARN
+    Description: EventBridge rule ARN
     Value: !GetAtt EventBridgeRule.Arn
   GetSentimentFunction:
-    Description: GetSentiment Function ARN
+    Description: GetSentiment function ARN
     Value: !GetAtt GetSentiment.Arn
   KARTESentimentAnalysisTopic:
     Description: KARTESentimentAnalysisTopic TopicName
